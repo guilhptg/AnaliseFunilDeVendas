@@ -63,25 +63,26 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     # --- Merge nos DataFrames ---
     
     # Tabela de 'pedidos' merged com 'itens_pedido'
-    df = pd.merge(dataframes_dict['orders'], dataframes_dict['orders_items'], on='order_id', how='left')
+    master_df = pd.merge(dataframes_dict['orders'], dataframes_dict['orders_items'], on='order_id', how='left')
     
     # Adicionar informações dos produtos
-    df = pd.merge(dataframes_dict['products'], on='products_id', how='left')
+    master_df = pd.merge(dataframes_dict['products'], on='products_id', how='left')
     
     # Adicionar informações dos clientes
-    df = pd.merge(dataframes_dict['customers'], on='customer_id', how='left')
+    master_df = pd.merge(dataframes_dict['customers'], on='customer_id', how='left')
     
     # Adicionar informações dos vendedores
-    df = pd.merge(dataframes_dict['sellers'], on='seller_id', how='left')
+    master_df = pd.merge(dataframes_dict['sellers'], on='seller_id', how='left')
     
     # Adicionar informações de pagamento
-    df = pd.merge(dataframes_dict['order_payments'], on='order_id', how='left')
+    master_df = pd.merge(dataframes_dict['order_payments'], on='order_id', how='left')
     
     # Adicionar a tradução da categoria do produto
-    df = pd.merge(dataframes_dict['product_category_name_translation'], on='product_category_name', how='left')
+    master_df = pd.merge(dataframes_dict['product_category_name_translation'], on='product_category_name', how='left')
     
     print("Merge de tabelas concluída.")
-    pass
+    
+    return master_df
 
 
 def clean_and_transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
@@ -97,7 +98,24 @@ def clean_and_transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: Um único DataFrame limpo e pronto para análise
     """
     
-    # df_columns = ['order_id' 'customer_id' 'order_status' 'order_purchase_timestamp' 
+    # df_columns
+    # ['order_id' 'customer_id' 'order_status' 'order_purchase_timestamp' 
     # 'order_approved_at' 'order_delivered_carrier_date'
     # 'order_delivered_customer_date' 'order_estimated_delivery_date']
-    pass
+    
+    columns_datetime = [
+        'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date',
+        'order_delivered_customer_date', 'order_estimated_delivery_date', 'shipping_limit_date'
+    ]
+    
+    for col in columns_datetime:
+        master_df[col] = pd.to_datetime(master_df[col], erros='coerce') # coerce to transnform erros in NaT (Not a Time)
+        
+    master_df.rename(columns={'product_category_name_english': 'product_category'}, inplace=True)
+    
+    master_df.drop(['product_category_name'], axis=1, inplace=True)
+    
+    print("    - Limpeza e transformação concluídas.")
+    print("clean_and_transform_data finalizada.")
+    
+    return master_df
