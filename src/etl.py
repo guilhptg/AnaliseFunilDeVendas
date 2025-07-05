@@ -72,19 +72,19 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     )
     
     # Adicionar informações dos produtos
-    master_df = pd.merge(dataframes_dict['products'], on='product_id', how='left')
+    master_df = pd.merge(master_df, dataframes_dict['products'], on='product_id', how='left')
     
     # Adicionar informações dos clientes
-    master_df = pd.merge(dataframes_dict['customers'], on='customer_id', how='left')
+    master_df = pd.merge(master_df, dataframes_dict['customers'], on='customer_id', how='left')
     
     # Adicionar informações dos vendedores
-    master_df = pd.merge(dataframes_dict['sellers'], on='seller_id', how='left')
+    master_df = pd.merge(master_df, dataframes_dict['sellers'], on='seller_id', how='left')
     
     # Adicionar informações de pagamento
-    master_df = pd.merge(dataframes_dict['order_payments'], on='order_id', how='left')
+    master_df = pd.merge(master_df, dataframes_dict['order_payments'], on='order_id', how='left')
     
     # Adicionar a tradução da categoria do produto
-    master_df = pd.merge(dataframes_dict['product_category_name_translation'], on='product_category_name', how='left')
+    master_df = pd.merge(master_df, dataframes_dict['product_category_name_translation'], on='product_category_name', how='left')
     
     print("Merge de tabelas concluída.")
     
