@@ -63,7 +63,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     # --- Merge nos DataFrames ---
     
     # Tabela de 'pedidos' merged com 'itens_pedido'
-    master_df = pd.merge(dataframes_dict['orders'], dataframes_dict['orders_items'], on='order_id', how='left')
+    master_df = pd.merge(dataframes_dict['orders'], dataframes_dict['order_items'], on='order_id', how='left')
     
     # Adicionar informações dos produtos
     master_df = pd.merge(dataframes_dict['products'], on='products_id', how='left')
