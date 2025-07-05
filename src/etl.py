@@ -81,7 +81,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         'product_category_name_translation': 'product_category_name'
     }
     
-    for nome_tabela, chave_merge in tabelas_para_merge:
+    for nome_tabela, chave_merge in tabelas_para_merge.items():
         if nome_tabela in dataframes_dict:
             master_df = pd.merge(master_df, dataframes_dict[nome_tabela], on=chave_merge, how='left')
         else:
