@@ -115,7 +115,7 @@ def clean_and_transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
     ]
     
     for col in columns_datetime:
-        master_df[col] = pd.to_datetime(master_df[col], erros='coerce') # coerce to transnform erros in NaT (Not a Time)
+        master_df[col] = pd.to_datetime(master_df[col], errors='coerce') # coerce to transnform erros in NaT (Not a Time)
         
     master_df.rename(columns={'product_category_name_english': 'product_category'}, inplace=True)
     
