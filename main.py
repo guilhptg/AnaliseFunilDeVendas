@@ -58,8 +58,9 @@ def main():
             master_df.to_parquet(output_path, index=False)
             
             logging.info("=============================================")
-            logging.info(f"Pipeline concluído com sucesso!")
             logging.info(f"Dataset processado salvo em: {output_path}")
+            logging.info("=============================================\n")
+            logging.info(f"Pipeline concluído com sucesso!")
             logging.info("=============================================\n")
 
 
