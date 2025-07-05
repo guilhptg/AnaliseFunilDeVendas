@@ -66,7 +66,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     master_df = pd.merge(dataframes_dict['orders'], dataframes_dict['order_items'], on='order_id', how='left')
     
     # Adicionar informações dos produtos
-    master_df = pd.merge(dataframes_dict['products'], on='products_id', how='left')
+    master_df = pd.merge(dataframes_dict['products'], on='product_id', how='left')
     
     # Adicionar informações dos clientes
     master_df = pd.merge(dataframes_dict['customers'], on='customer_id', how='left')
