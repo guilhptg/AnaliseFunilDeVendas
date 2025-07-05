@@ -45,6 +45,30 @@ def load_all_data(raw_data_path: str) -> dict:
     return dataframes_dict
 
 
+def processar_geolocalizacao(df_geo: pd.DataFrame) -> pd.DataFrame:
+    """
+    Processa e agrega dados de geolocalização.
+    Calcula a latitude e longitude médias para cada prefixo de CEP.
+
+    Args:
+        df_geo (pd.DataFrame): O DataFrame de geolocalização bruto.
+
+    Returns:
+        pd.DataFrame: Um DataFrame com coordenadas médias por prefixo de CEP.
+    """
+    
+    logging.info("Processando dados de geolocalização...")
+    
+    df_geo_agg = df_geo.groupby('geolocation_zip_code_prefix').agg({
+        'geolocation_lat': 'mean',
+        'geolocation_lng': 'mean'
+    }).reset_index()
+    
+    logging.info("Agregação de geolocalização concluída.\n")
+    
+    return df_geo_agg
+
+
 def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     # Lógica para unir dataframes (orders, items, products, customers, payments, reviews ...)
     # return master_df
@@ -57,6 +81,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Um único DataFrame, porem ainda bruto.
     """
+    
     if not dataframes_dict:
         logging.error("ERRO: Dicionário de dataframes está vazio. Transformação cancelada.")
         return None
@@ -66,6 +91,9 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     # --- Merge nos DataFrames ---
     
     logging.info("Iniciando merge de tabelas ...")
+    
+    # Processamento de Geolocalização
+    df_geo_agg = processar_geolocalizacao(dataframes_dict['geolocation'])
     
     # Primeiro merge
     master_df = pd.merge(
@@ -84,11 +112,25 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         'product_category_name_translation': 'product_category_name'
     }
     
+    # --- Merge dos DataFrames Principais ---
     for nome_tabela, chave_merge in tabelas_para_merge.items():
         if nome_tabela in dataframes_dict:
             master_df = pd.merge(master_df, dataframes_dict[nome_tabela], on=chave_merge, how='left')
         else:
             logging.error(f"AVISO: Tabela '{nome_tabela}' não encontrada. Merge será pulado, verifique as informações da tabela.")
+    
+    
+    # --- Merge com Dados Geográficos ---
+    # Merge para obter as coordenadas do cliente
+    master_df = pd.merge(master_df, df_geo_agg, left_on='customer_zip_code_prefix', right_on='geolocation_zip_code_prefix', how='left')
+    master_df.rename(columns={'geolocation_lat': 'customer_lat', 'geolocation_lng': 'customer_lng'}, inplace=True)
+    master_df.drop('geolocation_zip_code_prefix', axis=1, inplace=True)
+
+
+    # Merge para obter as coordenadas do vendedor
+    master_df = pd.merge(master_df, df_geo_agg, left_on='seller_zip_code_prefix', right_on='geolocation_zip_code_prefix', how='left')
+    master_df.rename(columns={'geolocation_lat': 'seller_lat', 'geolocation_lng': 'seller_lng'}, inplace=True)
+    master_df.drop('geolocation_zip_code_prefix', axis=1, inplace=True)
     
     logging.info("Merge de tabelas concluída.")
     
