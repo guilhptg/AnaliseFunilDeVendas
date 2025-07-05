@@ -71,7 +71,7 @@ Para executar este projeto localmente, siga os passos abaixo:
 
 ```bash
 # 1. Clone o repositório
-git clone [https://github.com/seu-usuario/AnaliseFunilDeVendas.git](https://github.com/seu-usuario/AnaliseFunilDeVendas.git)
+git clone https://github.com/guilhptg/AnaliseFunilDeVendas.git
 cd AnaliseFunilDeVendas
 
 # 2. Crie e ative o ambiente virtual
