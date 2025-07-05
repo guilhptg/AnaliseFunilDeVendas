@@ -1,9 +1,12 @@
 import pandas as pd
 import os
 
+import logging
+from src.config import setup_logging
 
-path = 'data/'
 
+# Logging config
+setup_logging()
 
 
 def load_all_data(raw_data_path: str) -> dict:
@@ -22,7 +25,7 @@ def load_all_data(raw_data_path: str) -> dict:
     """
     dataframes_dict = {}
     n_arquivos = 0
-    print('Iniciando carregamento de dados brutos ...')
+    logging.info('Iniciando carregamento de dados brutos ...')
     
     try:
         for arquivo in os.listdir(raw_data_path):
@@ -30,14 +33,14 @@ def load_all_data(raw_data_path: str) -> dict:
                 nome_df = arquivo.replace('.csv', '').replace('olist_', '').replace('_dataset', '')
                 caminho_completo = os.path.join(raw_data_path, arquivo)
                 dataframes_dict[nome_df] = pd.read_csv(caminho_completo)
-                print(f'    - Arquivo "{arquivo}" carregado como "{nome_df}" em {caminho_completo[:-7]}.')
+                logging.info(f'    - Arquivo "{arquivo}" carregado como "{nome_df}" em {caminho_completo[:-7]}.')
                 n_arquivos += 1
                 
     except FileNotFoundError:
-        print(f'ERRO: O diretório especificado não foi possível ser encontrado. - {raw_data_path}')
+        logging.error(f'ERRO: O diretório especificado não foi possível ser encontrado. - {raw_data_path}')
         return None
     
-    print(f"Carregamento de {n_arquivos} dados brutos concluído. \n")
+    logging.info(f"Carregamento de {n_arquivos} dados brutos concluído. \n")
     
     return dataframes_dict
 
@@ -55,14 +58,14 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         pd.DataFrame: Um único DataFrame, porem ainda bruto.
     """
     if not dataframes_dict:
-        print("ERRO: Dicionário de dataframes está vazio. Transformação cancelada.")
+        logging.error("ERRO: Dicionário de dataframes está vazio. Transformação cancelada.")
         return None
     
-    print("Iniciando modelagem de dados ...")
+    logging.info("Iniciando modelagem de dados ...")
     
     # --- Merge nos DataFrames ---
     
-    print("Iniciando merge de tabelas ...")
+    logging.info("Iniciando merge de tabelas ...")
     
     # Primeiro merge
     master_df = pd.merge(
@@ -85,9 +88,9 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         if nome_tabela in dataframes_dict:
             master_df = pd.merge(master_df, dataframes_dict[nome_tabela], on=chave_merge, how='left')
         else:
-            print(f"AVISO: Tabela '{nome_tabela}' não encontrada. Merge será pulado, verifique as informações da tabela.")
+            logging.error(f"AVISO: Tabela '{nome_tabela}' não encontrada. Merge será pulado, verifique as informações da tabela.")
     
-    print("Merge de tabelas concluída.")
+    logging.info("Merge de tabelas concluída.")
     
     return master_df
 
@@ -136,7 +139,7 @@ def ajust_data(master_df: pd.DataFrame) -> pd.DataFrame:
     
     master_df.drop(['product_category_name'], axis=1, inplace=True)
     
-    print("    - Limpeza e transformação concluídas.")
-    print("clean_and_transform_data finalizada.")
+    logging.info("    - Limpeza e transformação concluídas.")
+    logging.info("clean_and_transform_data finalizada.")
     
     return master_df
