@@ -46,6 +46,7 @@ def main():
             print(f"Pipeline concluído com sucesso!")
             print(f"Dataset processado salvo em: {output_path}")
             print("=============================================\n")
-            
+
+
 if __name__ == "__main__":
     main()
