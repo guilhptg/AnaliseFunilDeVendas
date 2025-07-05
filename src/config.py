@@ -15,5 +15,4 @@ def setup_logging():
         datefmt='%Y-%m-%d %H:%M:%S',
         stream=sys.stdout  # Garante que os logs vão para a saída padrão
     )
-    logging.info("Logging configurado com sucesso.")
 
