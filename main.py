@@ -1,5 +1,15 @@
-from src.etl import load_all_data, merge_data, clean_and_transform_data
+from src.etl import load_all_data, merge_data, transform_data, ajust_data
 import os
+import logging
+
+
+# Logging config
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
 
 # Relative PATH's
 RAW_DATA_PATH = 'data/raw'
@@ -11,10 +21,10 @@ def main():
     """
     Main Function -Executa o pipeline de ETL completo.
     """
-    print("Hello from Análise Funil de Vendas!")
-    print("=============================================")
-    print("Iniciando pipeline de ETL para o dataset Olist")
-    print("=============================================\n")
+    logging.info("Hello from Análise Funil de Vendas!")
+    logging.info("=============================================")
+    logging.info("Iniciando pipeline de ETL para o dataset Olist")
+    logging.info("=============================================\n")
     
     # =============== Extração ===============
     # Carregar dados brutos da pasta 'data/raw'
@@ -27,10 +37,17 @@ def main():
         master_df = merge_data(dataframes_dict)
         
         try:
-            master_df = clean_and_transform_data(master_df)
+            master_df = transform_data(master_df)
         except Exception as e:
-            print(f'Erro inesperado ao limpar os dados: {e}')
+            logging.error(f'Erro inesperado ao transformar os dados: {e}')
 
+        
+        try:
+            master_df = ajust_data(master_df)
+        except Exception as e:
+            logging.error(f'Error inesperado ao ajustar os dados: {e}')
+            
+        
         # =================== Extract ===================
         # Extrair DataFrame tratado para 'data/processed'
         if master_df is not None:
@@ -42,10 +59,10 @@ def main():
             # Salvar em formado .parquet para melhor processamento e performance
             master_df.to_parquet(output_path, index=False)
             
-            print("=============================================")
-            print(f"Pipeline concluído com sucesso!")
-            print(f"Dataset processado salvo em: {output_path}")
-            print("=============================================\n")
+            logging.info("=============================================")
+            logging.info(f"Pipeline concluído com sucesso!")
+            logging.info(f"Dataset processado salvo em: {output_path}")
+            logging.info("=============================================\n")
 
 
 if __name__ == "__main__":
