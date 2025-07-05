@@ -64,6 +64,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
     
     print("Iniciando merge de tabelas ...")
     
+    # Primeiro merge
     master_df = pd.merge(
         left=dataframes_dict['orders'],
         right=dataframes_dict['order_items'],
@@ -71,27 +72,27 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         how='left'
     )
     
-    # Adicionar informações dos produtos
-    master_df = pd.merge(master_df, dataframes_dict['products'], on='product_id', how='left')
+    # Tratamento para futuras mudanças nas tabelas
+    tabelas_para_merge = {
+        'products': 'product_id',
+        'customers': 'customer_id',
+        'sellers': 'seller_id',
+        'order_payments': 'order_id',
+        'product_category_name_translation': 'product_category_name'
+    }
     
-    # Adicionar informações dos clientes
-    master_df = pd.merge(master_df, dataframes_dict['customers'], on='customer_id', how='left')
-    
-    # Adicionar informações dos vendedores
-    master_df = pd.merge(master_df, dataframes_dict['sellers'], on='seller_id', how='left')
-    
-    # Adicionar informações de pagamento
-    master_df = pd.merge(master_df, dataframes_dict['order_payments'], on='order_id', how='left')
-    
-    # Adicionar a tradução da categoria do produto
-    master_df = pd.merge(master_df, dataframes_dict['product_category_name_translation'], on='product_category_name', how='left')
+    for nome_tabela, chave_merge in tabelas_para_merge:
+        if nome_tabela in dataframes_dict:
+            master_df = pd.merge(master_df, dataframes_dict[nome_tabela], on=chave_merge, how='left')
+        else:
+            print(f"AVISO: Tabela '{nome_tabela}' não encontrada. Merge será pulado, verifique as informações da tabela.")
     
     print("Merge de tabelas concluída.")
     
     return master_df
 
 
-def clean_and_transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
+def transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
     # Lógica para converter conlunas de dadta, tratar valores nulos,
     # Criar novas colunas ( ex: tempo_de_entrega )
     """
@@ -116,6 +117,20 @@ def clean_and_transform_data(master_df: pd.DataFrame) -> pd.DataFrame:
     
     for col in columns_datetime:
         master_df[col] = pd.to_datetime(master_df[col], errors='coerce') # coerce to transnform erros in NaT (Not a Time)
+    
+    return master_df
+
+
+def ajust_data(master_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ajusta e renomeia colunas de categoria.
+
+    Args:
+        master_df (pd.DataFrame): DataFrame unido.
+
+    Returns:
+        pd.DataFrame: DataFrame com colunas de categoria renomeadas.
+    """
         
     master_df.rename(columns={'product_category_name_english': 'product_category'}, inplace=True)
     
