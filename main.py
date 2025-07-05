@@ -1,14 +1,12 @@
 from src.etl import load_all_data, merge_data, transform_data, ajust_data
 import os
+
 import logging
+from src.config import setup_logging
 
 
 # Logging config
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+setup_logging()
 
 
 # Relative PATH's
