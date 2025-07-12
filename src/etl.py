@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import sqlite3
 
 import logging
 from src.config import setup_logging
@@ -185,3 +186,28 @@ def ajust_data(master_df: pd.DataFrame) -> pd.DataFrame:
     logging.info("clean_and_transform_data finalizada.")
     
     return master_df
+
+
+def save_to_sqlite(df: pd.DataFrame, path_db: str, table_name: str):
+    """
+    Salva o DataFrame em uma tabela de um banco de dados SQLite.
+
+    Args:
+        df (pd.DataFrame): DataFrame unido e ajustado, master_dataset.parquet
+        path_db (str): Caminho 
+        table_name (str): Nome da tabela no SQLite
+    """
+    
+    if df is None:
+        logging.error("DataFrame de entrada está vazio. Não foi possível salvar no SQLite.")
+        return
+    
+    logging.info(f"Iniciando carga de dados para o banco de dados SQLite em '{path_db}'...")
+    
+    try:
+        conn = sqlite3.connect(path_db)
+        df.to_sql(name=table_name, con=conn, if_exists='replace', index=False)
+        conn.close()
+        logging.info(f'Dados salvos com sucesso na tabela: "{table_name}".')
+    except Exception as e:
+        logging.error(f"Ocorreu um erro ao salvar no SQLite: {e}")
