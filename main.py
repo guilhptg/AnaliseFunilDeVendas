@@ -1,4 +1,4 @@
-from src.etl import load_all_data, merge_data, transform_data, ajust_data
+from src.etl import load_all_data, merge_data, transform_data, ajust_data, save_to_sqlite
 import os
 
 import logging
@@ -12,7 +12,11 @@ setup_logging()
 # Relative PATH's
 RAW_DATA_PATH = 'data/raw'
 PROCESSED_DATA_PATH = 'data/processed'
-OUTPUT_FILENAME = 'olist_master_dataset.parquet'
+DATABASE_PATH = 'data/database'
+OUTPUT_FILENAME_PARQUET = 'olist_master_dataset.parquet'
+OUTPUT_FILENAME_CSV = 'olist_master_dataset.csv'
+OUTPUT_DB = 'olist.db'
+TABLE_NAME = 'olist_master'
 
 
 def main():
@@ -52,13 +56,25 @@ def main():
             # Garantir que a pasta de 'data/processed' exista antes de salvar
             os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
 
-            output_path = os.path.join(PROCESSED_DATA_PATH, OUTPUT_FILENAME)
+            output_path_parquet = os.path.join(PROCESSED_DATA_PATH, OUTPUT_FILENAME_PARQUET)
+            output_path_csv = os.path.join(PROCESSED_DATA_PATH, OUTPUT_FILENAME_CSV)
             
             # Salvar em formado .parquet para melhor processamento e performance
-            master_df.to_parquet(output_path, index=False)
+            master_df.to_parquet(output_path_parquet, index=False)
+            
+            # Salvar em formato .csv para subir no Google Sheets
+            master_df.to_csv(output_path_csv, index=False)
+            
+            # Salvar em um banco de dados SQLite
+            path_db = os.path.join(DATABASE_PATH, OUTPUT_DB)
+            save_to_sqlite(master_df, path_db, TABLE_NAME)
             
             logging.info("=============================================")
-            logging.info(f"Dataset processado salvo em: {output_path}")
+            logging.info(f"Dataset .PARQUET processado salvo em: {output_path_parquet}")
+            logging.info("=============================================\n")
+            logging.info(f"Dataset .CSV processado salvo em: {output_path_csv}")
+            logging.info("=============================================\n")
+            logging.info(f"Database processado salvo em: {path_db}")
             logging.info("=============================================\n")
             logging.info(f"Pipeline concluído com sucesso!")
             logging.info("=============================================\n")
