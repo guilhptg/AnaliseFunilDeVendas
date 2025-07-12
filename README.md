@@ -56,10 +56,10 @@ O projeto foi estruturado para garantir a separação de responsabilidades, repr
 
 ### Ferramentas Utilizadas
 * **Linguagem:** Python 3.12
-* **Bibliotecas Principais:** Pandas, PyArrow
+* **Bibliotecas Principais:** Pandas, NumPy, PyArrow
 * **Gerenciador de Pacotes e Ambiente:** UV
-* **Análise Exploratória:** Jupyter Notebook
-* **Visualização de Dados:** Power BI (ou Tableau, Metabase, etc.)
+* **Análise Exploratória:** Jupyter Notebook, MatPlotLib, Seaborn
+* **Visualização de Dados:** ** Looker Studio ( Google Data Studio ) **
 * **Controle de Versão:** Git & GitHub
 
 
