@@ -5,6 +5,7 @@ import sqlite3
 import logging
 from src.config import setup_logging
 
+from pandas_gbq import to_gbq
 
 # Logging config
 setup_logging()
@@ -110,6 +111,7 @@ def merge_data(dataframes_dict: dict) -> pd.DataFrame:
         'customers': 'customer_id',
         'sellers': 'seller_id',
         'order_payments': 'order_id',
+        'order_reviews': 'order_id',    
         'product_category_name_translation': 'product_category_name'
     }
     
@@ -211,3 +213,31 @@ def save_to_sqlite(df: pd.DataFrame, path_db: str, table_name: str):
         logging.info(f'Dados salvos com sucesso na tabela: "{table_name}".')
     except Exception as e:
         logging.error(f"Ocorreu um erro ao salvar no SQLite: {e}")
+        
+        
+def save_to_bigquery(df: pd.DataFrame, project_id: str, destination_table:str):
+    """
+    Salva o DataFrame em uma tabela do Google Query
+
+    Args:
+        df (pd.DataFrame): Master DataFrame
+        project_id (str): ID Project from Google BigQuery
+        destination_table (str): SQLite table
+    """
+    
+    if df is None:
+        logging.error("DataFrame de entrada está vazio. Não foi possivel salvar no BigQuery")
+        return
+    
+    logging.info(f'Iniciando carga para BigQuery no projeto: "{project_id}"... ')
+    
+    try:
+        to_gbq(
+            dataframe=df,
+            destination_table=destination_table,
+            project_id=project_id,
+            if_exists='replace'
+        )
+        logging.info(f'Dados salvos com sucesso na tabela "{destination_table}" do BigQuery.')
+    except Exception as e:
+        logging.error(f'Ocorreu um erro ao salvar no Google BigQuery: {e}')
