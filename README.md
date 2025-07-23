@@ -3,6 +3,8 @@
 
 **Análise completa do ciclo de vida de pedidos da Olist para identificar gargalos operacionais e oportunidades de otimização na jornada do cliente.**
 
+### [Link](https://lookerstudio.google.com/reporting/b161d778-6616-4210-a5f3-54951e34b9a7)
+
 ---
 
 ### Sumário
