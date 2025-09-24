@@ -26,7 +26,7 @@ BIGQUERY_TABLE_ID = 'olist_data.olist_master'
 
 def main():
     """
-    Main Function -Executa o pipeline de ETL completo.
+    Main Function - Executa o pipeline de ETL completo.
     """
     logging.info("Hello from Análise Funil de Vendas!")
     logging.info("=============================================")
